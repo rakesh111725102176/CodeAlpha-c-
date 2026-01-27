@@ -1,0 +1,91 @@
+#include <iostream>
+#include <vector>
+using namespace std;
+
+class Transaction {
+public:
+    string type;
+    double amount;
+
+    Transaction(string t, double a) {
+        type = t;
+        amount = a;
+    }
+};
+
+class Account {
+private:
+    double balance;
+    vector<Transaction> history;
+
+public:
+    Account(double initialBalance = 0) {
+        balance = initialBalance;
+    }
+
+    void deposit(double amount) {
+        balance += amount;
+        history.push_back(Transaction("Deposit", amount));
+        cout << "Deposited: " << amount << endl;
+    }
+
+    void withdraw(double amount) {
+        if (amount > balance) {
+            cout << "Insufficient funds!" << endl;
+        } else {
+            balance -= amount;
+            history.push_back(Transaction("Withdrawal", amount));
+            cout << "Withdrawn: " << amount << endl;
+        }
+    }
+
+    void fundTransfer(Account &to, double amount) {
+        if (amount > balance) {
+            cout << "Insufficient funds for transfer!" << endl;
+        } else {
+            balance -= amount;
+            to.balance += amount;
+            history.push_back(Transaction("Transfer to another account", amount));
+            to.history.push_back(Transaction("Transfer from another account", amount));
+            cout << "Transferred: " << amount << endl;
+        }
+    }
+
+    void printBalance() {
+        cout << "Current Balance: " << balance << endl;
+    }
+
+    void printTransactionHistory() {
+        cout << "Transaction History:" << endl;
+        for (auto t : history) {
+            cout << t.type << ": " << t.amount << endl;
+        }
+    }
+};
+
+class Customer {
+public:
+    string name;
+    Account account;
+
+    Customer(string n, double initialBalance = 0) : name(n), account(initialBalance) {}
+};
+
+int main() {
+    Customer c1("Parth", 1000);
+    Customer c2("Uma", 500);
+
+    c1.account.deposit(500);
+    c1.account.withdraw(200);
+    c1.account.fundTransfer(c2.account, 300);
+
+    cout << c1.name << "'s Account:" << endl;
+    c1.account.printBalance();
+    c1.account.printTransactionHistory();
+
+    cout << "\n" << c2.name << "'s Account:" << endl;
+    c2.account.printBalance();
+    c2.account.printTransactionHistory();
+
+    return 0;
+}
